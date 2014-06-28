@@ -20,7 +20,7 @@ INCLUDES=
 #delete output file if error occured
 .DELETE_ON_ERROR:
 
-all: envmod.exe
+all: envmod.exe envmod2.exe
 
 clean:
 	@-rm *.o 2>/dev/null
