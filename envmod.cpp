@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <cstdio>
 #include <ctime>
+#include <sys/time.h>
 //#include <iostream>
 #include <cstring>
 //#include <string>
@@ -18,17 +19,22 @@ int main(int argc, char* argv[], char* envp[]) {
 		return 1;
 	}
 	char *buf=NULL;
-	clock_t t=0;
+	//clock_t t=0;
+	struct timeval tv;
+	struct timeval tv2;
 	/*1*/
-	t=clock();
+	//t=clock();
+	gettimeofday(&tv, NULL);
 	for(int a=0;a<LOOP;++a) {
 		for(int i=0;envp[i]!=NULL;++i) {
 			if(strncmp(envp[i],"PATH=",5)==0) buf=envp[i]+5;
 		}
 	}
-	t=clock()-t;
+	//t=clock()-t;
+	gettimeofday(&tv2, NULL);
 	printf("%s\n", buf);
-	printf ("%d clicks (%f seconds)\n", (int)t, ((float)t)/CLOCKS_PER_SEC);
+	//printf ("%d clicks (%f seconds)\n", (int)t, ((float)t)/CLOCKS_PER_SEC);
+	printf("%li seconds %li micro\n", tv2.tv_sec - tv.tv_sec, tv2.tv_usec - tv.tv_usec);
 	//*/
 	/*2
 	t=clock();
