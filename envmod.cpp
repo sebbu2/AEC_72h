@@ -83,6 +83,7 @@ int main(int argc, char* argv[]) {
 			printf("\tsave 'file'\nsave variables to 'file'\n");
 			printf("\taddb 'VAR' 'pos' 'dir'\nadd 'dir' before the 'pos'th entry in 'VAR'\n");
 			printf("\taddp 'VAR' 'pos' 'dir'\nadd 'dir' after the 'pos'th entry in 'VAR'\n");
+			printf("\tdel 'VAR' 'dir'\n\trm 'VAR' 'dir'\nremove the 'dir' entry in 'VAR'\n");
 		}
 		if(strcmp(argv[i],"addp")==0) {
 			NEED_ARG("addp", 3);
@@ -139,7 +140,6 @@ int main(int argc, char* argv[]) {
 				return 2;
 			}
 			int pos1=find_nth(val2, nb-1, SEPC);
-			printf("%d\n", pos1);
 			if(pos1==string::npos || pos1==0) {
 				val2=string(arg3)+';'+val2;
 			}
@@ -151,6 +151,33 @@ int main(int argc, char* argv[]) {
 #else
 			putenv((string(arg1)+'='+val2).c_str());
 #endif
+		}
+		if(strcmp(argv[i],"del")==0||strcmp(argv[i],"rm")==0) {
+			NEED_ARG("del", 2);
+			const char* arg1=argv[i+1];
+			const char* arg2=argv[i+2];
+			if(strstr(VARS.c_str(), (string(":")+arg1+':').c_str())==NULL) {
+				fprintf(stderr, "ERROR: variable %s not supported.\n", argv[i+1]);
+				return 2;
+			}
+			const char* val=getenv(arg1);
+			string val2=string(val);
+			if(strstr((';'+val2+';').c_str(), (string(SEPS)+arg2+SEPC).c_str())==NULL) {
+				fprintf(stderr, "ERROR: variable doesn't contain specified directory to remove.\n");
+				return 2;
+			}
+			int pos1=val2.find(arg2);
+			printf("%d\n", pos1);
+			string val2b;
+			if(pos1!=string::npos && pos1!=0) {
+				val2b=val2.substr(0, pos1-1);
+			}
+			if(pos1+strlen(arg2)+1<val2.size()) {
+				if(val2b.size()>0) val2b+=';';
+				val2b+=val2.substr(pos1+strlen(arg2)+1);
+			}
+			val2=val2b;
+			printf("%s\n", val2.c_str());
 		}
 		if(strcmp(argv[i],"save")==0) {
 			NEED_ARG("save", 1);
