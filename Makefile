@@ -1,10 +1,10 @@
 DEBUG=-O0 -g -D_DEBUG
 #DEBUG+=-fno-lto
-CPPFLAGS=$(DEBUG) -D__USE_MINGW_ANSI_STDIO=1 -W -Wall -Wextra -Werror -ansi -pedantic -pedantic-errors -Wshadow -Wconversion
+CPPFLAGS=$(DEBUG) -D__USE_MINGW_ANSI_STDIO=1 -W -Wall -Wextra -Werror -ansi -pedantic -pedantic-errors -Wshadow -Wno-conversion -Wno-sign-conversion -Wno-sign-compare
 CC=gcc
 CFLAGS=-std=c99 -Wc++-compat
 CXX=g++
-CXXFLAGS=-Wsign-conversion -Woverloaded-virtual -std=gnu++98 -Wno-long-long -fno-rtti -Wc++0x-compat
+CXXFLAGS=-Woverloaded-virtual -std=gnu++98 -Wno-long-long -fno-rtti -Wc++0x-compat
 LD=ld
 LDFLAGS=-Wl,--as-needed
 #LDFLAGS+=-Wl,--reduce-memory-overheads -Wl,--no-keep-memory
