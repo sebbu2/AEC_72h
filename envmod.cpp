@@ -28,6 +28,11 @@ void print_vars(const string list) {
 	while(b!=string::npos);
 }
 
+#define NEED_ARG(func, nb) if(i+nb>=argc) {\
+				fprintf(stderr, "ERROR : missing argument for %s.\n", func);\
+				return 1;\
+			}
+
 int main(int argc, char* argv[]) {
 	if(argc==2) {
 		if( strcmp(argv[1],"-v")==0 || strcmp(argv[1],"--version")==0 ) {
@@ -35,6 +40,8 @@ int main(int argc, char* argv[]) {
 			return 0;
 		}
 	}
+	string file;
+	string ext;
 	for(int i=1; i<argc; ++i) {
 		if(strcmp(argv[i],"vars")==0) {
 			printf("VARS = %s\n", VARS.c_str());
@@ -49,12 +56,56 @@ int main(int argc, char* argv[]) {
 			print_vars(VARS2);
 		}
 		if(strcmp(argv[i],"print")==0) {
-			if(i+1>=argc) {
-				fprintf(stderr, "ERROR : missing argument for print.\n");
-				return 1;
-			}
+			NEED_ARG("print", 1);
 			printf("\t%s=%s\n", argv[i+1], getenv(argv[i+1]));
 			++i;
+		}
+		if(strcmp(argv[i],"save")==0) {
+			NEED_ARG("save", 1);
+			file=argv[i+1];
+			int extp=file.rfind('.');
+			if(extp==string::npos) {
+				fprintf(stderr, "ERROR: no extension given for save.\n");
+				return 2;
+			}
+			ext=file.substr(extp+1);
+			if(strstr(":sh:bat:", (':'+ext+':').c_str())==NULL) {
+				fprintf(stderr, "ERROR: unknown extension for save : '%s'.\n", ext.c_str());
+			}
+			FILE* fp=fopen(file.c_str(), "w");
+			if(ext=="sh") {
+				fprintf(fp, "#!/bin/sh\n");
+				int a=0;
+				int b=0;
+				string var;
+				do {
+					b=VARS.find(':', a);
+					var=VARS.substr(a, b-a);
+					const char *val=getenv(var.c_str());
+					if(val==NULL) val="";
+					fprintf(fp, "export %s='%s'\n", var.c_str(), val);
+					a=b+1;
+					++i;
+				}
+				while(b!=string::npos);
+			}
+			else if(ext=="bat") {
+				fprintf(fp, "@echo off\r\n");
+				int a=0;
+				int b=0;
+				string var;
+				do {
+					b=VARS.find(':', a);
+					var=VARS.substr(a, b-a);
+					const char *val=getenv(var.c_str());
+					if(val==NULL) val="";
+					fprintf(fp, "set %s=%s\n", var.c_str(), val);
+					a=b+1;
+					++i;
+				}
+				while(b!=string::npos);
+			}
+			fclose(fp);
 		}
 	}
 	return 0;
